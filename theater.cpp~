@@ -54,7 +54,7 @@ void assignSeat(string & request, char theater[][20])
   char row;
   int j;
   int col;
-  bool isFirst = true;
+  bool flag = false;
 
   //iterate rows
   for(i = 0, row = 'A'; i < 10; i++) 
@@ -68,11 +68,8 @@ void assignSeat(string & request, char theater[][20])
 	      //set seat to filled
 	      theater[i][j] = 'x';
 
-	      if(isFirst)
-		{
+	      if(flag)
 		  cout << row << col;
-		  isFirst = false;
-		}
 	      else
 		cout << ", " << row << col;
 	      numPeeps--;
