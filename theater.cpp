@@ -25,9 +25,7 @@ void readFile(vector<string> & requests, char filename[])
       }
 
     else 
-      cout << "Unable to open file"; 
-
-   
+      cout << "Unable to open file";    
 }
 
 //this just fills an array of chars with "empty" values
@@ -43,108 +41,38 @@ void createTheater(char theater[][20])
 
 }
 
-void fillPrioritySeats(string & request, char theater[][20], int & numPeeps,
-		       bool & isFirst)
+//this just fills an array of chars with "empty" values
+void displayTheater(char theater[][20])
 {
-  int i;
-  char row;
-  int j;
-  int col;
-  if(numPeeps == 0)
-      return;
-
-  //iterate rows
-  for(i = 3, row = 'D'; i < 10; i++) 
+  for(int i = 0; i < 10; i++)
     {
-      //iterate columns
-      for(j = 5, col = 6; j < 15; j++)
+      for(int j = 0; j < 20; j++)
 	{
-	  //look for empty seats
-	  if(theater[i][j] == 'o')
-	    {
-	      //set seat to filled
-	      theater[i][j] = 'x';
+	  cout << theater[i][j];
+	}
+      cout << endl;
+    }
 
-	      if(isFirst)
-		{
-		  cout << row << col;
-		  isFirst = false;
-		}
-	      else
-		cout << ", " << row << col;
-	      numPeeps--;
-	    }
-	  if(numPeeps == 0)
-	    {
-	      cout << endl;
-	      return;
-	    }
-	  col++;
-	} //end inner for loop
-      row++;
-    } //end outer for loop
 }
 
-void fillLeftEdge(string & request, char theater[][20], int & numPeeps,
-		  bool & isFirst)
+void fillSection(string & request, char theater[][20], int & numPeeps,
+		 bool & isFirst, int section)
 {
   int i;
   char row;
   int j;
   int col;
-  
-  if(numPeeps == 0)
-    return;
-
-    //iterate rows
-  for(i = 3, row = 'D'; i < 10; i++) 
-    {
-      //iterate columns
-      for(j = 0, col = 1; j < 5; j++)
-	{
-	  //look for empty seats
-	  if(theater[i][j] == 'o')
-	    {
-	      //set seat to filled
-	      theater[i][j] = 'x';
-
-	      if(isFirst)
-		{
-		  cout << row << col;
-		  isFirst = false;
-		}
-	      else
-		cout << ", " << row << col;
-	      numPeeps--;
-	    }
-	  if(numPeeps == 0)
-	    {
-	      cout << endl;
-	      return;
-	    }
-	  col++;
-	} //end inner for loop
-      row++;
-    } //end outer for loop
-
-}
-void fillRightEdge(string & request, char theater[][20], int & numPeeps,
-		   bool & isFirst)
-{
-  int i;
-  char row;
-  int j;
-  int col;
+  int startCol = (section / 5) * 2;
+  int startRow = ((section - 1) % 4) * 5;
 
   if(numPeeps == 0)
       return;
   
-
     //iterate rows
-  for(i = 3, row = 'D'; i < 10; i++) 
+  for(i = startCol, row = 'A' + startCol; i < startCol + 2; i++) 
     {
       //iterate columns
-      for(j = 15, col = 16; j < 20; j++)
+      for(j = startRow, col = 1 + startRow; j < startRow + 5; j++)
 	{
 	  //look for empty seats
 	  if(theater[i][j] == 'o')
@@ -173,62 +101,51 @@ void fillRightEdge(string & request, char theater[][20], int & numPeeps,
 
 }
 
-void fillFrontSeats(string & request, char theater[][20], int & numPeeps,
-		    bool & isFirst)
+bool isEnoughSpace(char theater[][20], int section, int numPeeps)
 {
-  int i;
-  char row;
-  int j;
-  int col;
-  if(numPeeps == 0)
-      return;
-  
+  int count = 0;
+  int startCol = (section / 5) * 2;
+  int startRow = ((section - 1) % 4) * 5;
 
-    //iterate rows
-  for(i = 0, row = 'A'; i < 3; i++) 
-    {
-      //iterate columns
-      for(j = 0, col = 1; j < 20; j++)
-	{
-	  //look for empty seats
-	  if(theater[i][j] == 'o')
-	    {
-	      //set seat to filled
-	      theater[i][j] = 'x';
+  for(int i = startCol; i < startCol + 2; i++)
+    for(int j = startRow; j < startRow + 5; j++)
+      if(theater[i][j] == 'o')
+	count++;
 
-	      if(isFirst)
-		{
-		  cout << row << col;
-		  isFirst = false;
-		}
-	      else
-		cout << ", " << row << col;
-	      numPeeps--;
-	    }
-	  if(numPeeps == 0)
-	    {
-	      cout << endl;
-	      return;
-	    }
-	  col++;
-	} //end inner for loop
-      row++;
-    } //end outer for loop
-
+  if(numPeeps > count)
+    return true;
+  else
+    return false;
 }
 
 //algorithm for seat assignment
 void assignSeat(string & request, char theater[][20])
 {
   int numPeeps = request[5] - '0';
+  int sections[20] = {10, 11, 14, 15, 18, 
+			  19, 9, 12, 13, 16, 
+			  17, 20, 6, 7, 5, 
+			  8, 2, 3, 1, 4};
+
   cout << request.substr(0, 4) << " ";
   bool isFirst = true;
 
-  fillPrioritySeats(request, theater, numPeeps, isFirst);
-  fillLeftEdge(request, theater, numPeeps, isFirst);
-  fillRightEdge(request, theater, numPeeps, isFirst);
-  fillFrontSeats(request, theater, numPeeps, isFirst);
+  int i = 0;
+  //find which section to insert to
+  while(isEnoughSpace(theater, sections[i], numPeeps) && i < 21)
+    {
+      i++;
+    }
 
+  if(i > 20)
+    {
+      cout << "Sold out!!!" << endl;
+      return;
+    }
+
+  //fill seats with section algorithm
+  fillSection(request, theater, numPeeps, isFirst, sections[i]);      
+  
   if(numPeeps != 0)
     cout << "Sold Out!!!" << endl;
 
